@@ -2,6 +2,19 @@
 spring:
   application:
     name: wallet
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        enable_lazy_load_no_trans: true
+      jakarta:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: update
+              create-target: src/main/resources/ddl_jpa_creation.sql
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     type: com.zaxxer.hikari.HikariDataSource

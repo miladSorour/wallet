@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT w FROM Wallet w JOIN w.user u WHERE u.email = :email")
+    @Query("SELECT w FROM Wallet w JOIN w.user u WHERE u.username = :email")
     Optional<Wallet> findByUserEmailForUpdate(@Param("email") String email);
 }
