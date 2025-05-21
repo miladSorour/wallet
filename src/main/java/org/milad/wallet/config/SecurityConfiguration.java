@@ -1,7 +1,9 @@
 package org.milad.wallet.config;
 
 
+import com.nimbusds.jose.util.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -12,11 +14,14 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
+import javax.crypto.spec.SecretKeySpec;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 
@@ -63,6 +68,11 @@ public class SecurityConfiguration {
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
         return http.build();
+
     }
 
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(properties.getSecurity().getKey().getBytes(), "HmacSHA256")).build();
+    }
 }

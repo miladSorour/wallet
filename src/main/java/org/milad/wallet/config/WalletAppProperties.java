@@ -25,6 +25,7 @@ public class WalletAppProperties {
     @Getter
     public static class Security {
         private String contentSecurityPolicy = WalletDefaults.Security.contentSecurityPolicy;
+        private String key = WalletDefaults.Security.key;
     }
 
 }
