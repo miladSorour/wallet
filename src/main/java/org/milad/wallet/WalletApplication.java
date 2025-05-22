@@ -1,15 +1,10 @@
 package org.milad.wallet;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.milad.wallet.common.UtilDefaultProfile;
-import org.milad.wallet.config.WalletAppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -22,7 +17,6 @@ import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_DEVELOPMENT
 import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_PRODUCTION;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "wallet", version = "0.0.1"))
 @Slf4j
 public class WalletApplication {
 

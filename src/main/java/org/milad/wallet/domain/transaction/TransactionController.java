@@ -1,10 +1,11 @@
-package org.milad.wallet.domain.wallet;
+package org.milad.wallet.domain.transaction;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.milad.wallet.common.Pagination;
-import org.milad.wallet.domain.transaction.Transaction;
-import org.milad.wallet.domain.transaction.TransactionDto;
+import org.milad.wallet.domain.wallet.AmountDto;
+import org.milad.wallet.domain.wallet.TransferDto;
+import org.milad.wallet.domain.wallet.WalletService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,27 +22,17 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/wallet")
-public class WalletController {
+@RequestMapping("/api/transaction")
+public class TransactionController {
 
-    private final WalletService walletService;
+    private final TransactionService service;
 
-    @PostMapping("/topup")
-    public TransactionDto topUp(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto a) {
-        var tx = walletService.topUp(jwt.getSubject(), a.getAmount());
-        return map(tx);
-    }
-
-    @PostMapping("/withdraw")
-    public TransactionDto withdraw(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto a) {
-        var tx = walletService.withdraw(jwt.getSubject(), a.getAmount());
-        return map(tx);
-    }
-
-    @PostMapping("/transfer")
-    public String transfer(@AuthenticationPrincipal Jwt jwt, @RequestBody TransferDto t) {
-        walletService.transfer(jwt.getSubject(), t.getToEmail(), t.getAmount());
-        return "OK";
+    @GetMapping("/history")
+    public Page<TransactionDto> history(@AuthenticationPrincipal Jwt jwt, @Valid @ModelAttribute Pagination pagination) {
+        Sort sort = Sort.by(Sort.Direction.fromString(pagination.getDirection()), pagination.getSortBy());
+        PageRequest pageRequest = PageRequest.of(pagination.getPage(), pagination.getSize(), sort);
+        Page<Transaction> transactions = service.getHistory(jwt.getSubject(), pageRequest);
+        return transactions.map(this::map);
     }
 
     private TransactionDto map(Transaction tx) {

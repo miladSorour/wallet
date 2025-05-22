@@ -2,11 +2,10 @@ package org.milad.wallet.domain.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.milad.wallet.common.PasswordValidator;
+import org.milad.wallet.common.UtilPasswordValidator;
 import org.milad.wallet.domain.wallet.Wallet;
 import org.milad.wallet.domain.wallet.WalletService;
 import org.milad.wallet.exception.BadRequestAlertException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ public class UserService {
 
     @Transactional
     public User register(User user) {
-        PasswordValidator.isPasswordComplex(user.getPassword());
+        UtilPasswordValidator.isPasswordComplex(user.getPassword());
         if (repository.findByUsername(user.getUsername()).isPresent()) {
             throw new BadRequestAlertException("invalid username", "user", "NV");
         }

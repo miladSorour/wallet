@@ -4,7 +4,7 @@ import org.milad.wallet.exception.BadRequestAlertException;
 
 import java.util.regex.Pattern;
 
-public class PasswordValidator {
+public class UtilPasswordValidator {
 
     private static final String PASSWORD_PATTERN =
             "^(?=.*[0-9])" +           // at least 1 digit

@@ -7,7 +7,7 @@ import org.milad.wallet.domain.transaction.TransactionRepository;
 import org.milad.wallet.domain.transaction.TransactionType;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,39 +21,38 @@ public class WalletService {
         return repository.save(wallet);
     }
 
-    @Transactional
-    public Transaction topUp(String email, double amount) {
-        Wallet w = repository.findByUserEmailForUpdate(email)
-                .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        w.setBalance(w.getBalance() + amount);
-        return txRepo.save(new Transaction(w, TransactionType.TOPUP, amount, "Top-up"));
+    public Optional<Wallet> findByUsername(String username) {
+        return repository.findByUserUsername(username);
     }
 
     @Transactional
-    public Transaction withdraw(String email, double amount) {
-        Wallet w = repository.findByUserEmailForUpdate(email)
+    public Transaction topUp(String username, double amount) {
+        Wallet walletDB = repository.findByUserUsername(username)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        if (w.getBalance() < amount) throw new RuntimeException("Insufficient funds");
-        w.setBalance(w.getBalance() - amount);
-        return txRepo.save(new Transaction(w, TransactionType.WITHDRAW, amount, "Withdraw"));
+        walletDB.setBalance(walletDB.getBalance() + amount);
+        return txRepo.save(new Transaction(walletDB, TransactionType.TOPUP, amount, "Top-up"));
     }
 
     @Transactional
-    public void transfer(String fromEmail, String toEmail, double amount) {
-        Wallet src = repository.findByUserEmailForUpdate(fromEmail)
+    public Transaction withdraw(String username, double amount) {
+        Wallet walletDB = repository.findByUserUsername(username)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        if (walletDB.getBalance() < amount) throw new RuntimeException("Insufficient funds");
+        walletDB.setBalance(walletDB.getBalance() - amount);
+        return txRepo.save(new Transaction(walletDB, TransactionType.WITHDRAW, amount, "Withdraw"));
+    }
+
+    @Transactional
+    public void transfer(String fromUsername, String toUsername, double amount) {
+        Wallet src = repository.findByUserUsername(fromUsername)
                 .orElseThrow(() -> new RuntimeException("Source wallet not found"));
-        Wallet dst = repository.findByUserEmailForUpdate(toEmail)
+        Wallet dst = repository.findByUserUsername(toUsername)
                 .orElseThrow(() -> new RuntimeException("Destination wallet not found"));
         if (src.getBalance() < amount) throw new RuntimeException("Insufficient funds");
         src.setBalance(src.getBalance() - amount);
         dst.setBalance(dst.getBalance() + amount);
-        txRepo.save(new Transaction(src, TransactionType.TRANSFER, amount, "to:" + toEmail));
-        txRepo.save(new Transaction(dst, TransactionType.TRANSFER, amount, "from:" + fromEmail));
+        txRepo.save(new Transaction(src, TransactionType.TRANSFER, amount, "to:" + toUsername));
+        txRepo.save(new Transaction(dst, TransactionType.TRANSFER, amount, "from:" + fromUsername));
     }
 
-    public List<Transaction> getHistory(String email) {
-        Wallet w = repository.findByUserEmailForUpdate(email)
-                .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        return txRepo.findByWalletOrderByTimestampDesc(w);
-    }
 }

@@ -26,6 +26,7 @@ public class WalletAppProperties {
     public static class Security {
         private String contentSecurityPolicy = WalletDefaults.Security.contentSecurityPolicy;
         private String key = WalletDefaults.Security.key;
+        private Long jwtExpMin = WalletDefaults.Security.jwtExpMin;
     }
 
 }
