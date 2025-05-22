@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:oracle:thin:@127.0.0.1:1521:XE
+    username: milad
+    password: root
+    hikari:
+      poolName: wallet-prod
+      auto-commit: false
+      maximum-pool-size: 5
+      minimum-idle: 2
+      idle-timeout: 150000
+      connection-timeout: 15000
+      max-lifetime: 18000000
