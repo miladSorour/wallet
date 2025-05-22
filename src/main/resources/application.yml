@@ -1,7 +1,14 @@
 spring:
   application:
     name: wallet
+  profiles:
+    active: #spring.profiles.active#
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
   jpa:
+    open-in-view: false
     properties:
       hibernate:
         show_sql: true
