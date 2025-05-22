@@ -15,7 +15,7 @@ import lombok.Setter;
 import org.milad.wallet.domain.wallet.Wallet;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor

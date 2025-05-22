@@ -59,8 +59,9 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(authz ->
                         authz
+                                .requestMatchers("/auth/login/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/api/**").authenticated()
+                                .requestMatchers("/api/**").permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions ->

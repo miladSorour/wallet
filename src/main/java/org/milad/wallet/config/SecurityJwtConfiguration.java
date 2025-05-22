@@ -1,6 +1,10 @@
 package org.milad.wallet.config;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import lombok.extern.slf4j.Slf4j;
 import org.milad.wallet.domain.security.SecurityMetersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +18,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @Slf4j
 public class SecurityJwtConfiguration {
 
-    public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
+    public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
 
     @Autowired
     WalletAppProperties properties;
@@ -51,11 +56,16 @@ public class SecurityJwtConfiguration {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
+        SecretKey secretKey = getSecretKey();
+        OctetSequenceKey octetSequenceKey = new OctetSequenceKey.Builder(secretKey)
+                .keyID("hmac-key-1")
+                .build();
+        JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(octetSequenceKey));
+        return new NimbusJwtEncoder(jwkSource);
     }
 
     private SecretKey getSecretKey() {
-        byte[] keyBytes = properties.getSecurity().getKey().getBytes();
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
+        return new SecretKeySpec(properties.getSecurity().getKey().getBytes(StandardCharsets.UTF_8), JWT_ALGORITHM.getName());
     }
+
 }

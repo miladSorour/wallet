@@ -3,7 +3,7 @@ spring:
     driver-class-name: oracle.jdbc.OracleDriver
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:oracle:thin:@127.0.0.1:1521:XE
-    username: milad
+    username: wallet
     password: root
     hikari:
       poolName: wallet-prod

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.milad.wallet.domain.transaction.Transaction;
 import org.milad.wallet.domain.transaction.TransactionRepository;
 import org.milad.wallet.domain.transaction.TransactionType;
-import org.milad.wallet.domain.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,13 +13,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WalletService {
 
-    private final UserRepository userRepo;
-    private final WalletRepository walletRepo;
+    private final WalletRepository repository;
     private final TransactionRepository txRepo;
 
     @Transactional
+    public Wallet save(Wallet wallet) {
+        return repository.save(wallet);
+    }
+
+    @Transactional
     public Transaction topUp(String email, double amount) {
-        Wallet w = walletRepo.findByUserEmailForUpdate(email)
+        Wallet w = repository.findByUserEmailForUpdate(email)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
         w.setBalance(w.getBalance() + amount);
         return txRepo.save(new Transaction(w, TransactionType.TOPUP, amount, "Top-up"));
@@ -28,7 +31,7 @@ public class WalletService {
 
     @Transactional
     public Transaction withdraw(String email, double amount) {
-        Wallet w = walletRepo.findByUserEmailForUpdate(email)
+        Wallet w = repository.findByUserEmailForUpdate(email)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
         if (w.getBalance() < amount) throw new RuntimeException("Insufficient funds");
         w.setBalance(w.getBalance() - amount);
@@ -37,9 +40,9 @@ public class WalletService {
 
     @Transactional
     public void transfer(String fromEmail, String toEmail, double amount) {
-        Wallet src = walletRepo.findByUserEmailForUpdate(fromEmail)
+        Wallet src = repository.findByUserEmailForUpdate(fromEmail)
                 .orElseThrow(() -> new RuntimeException("Source wallet not found"));
-        Wallet dst = walletRepo.findByUserEmailForUpdate(toEmail)
+        Wallet dst = repository.findByUserEmailForUpdate(toEmail)
                 .orElseThrow(() -> new RuntimeException("Destination wallet not found"));
         if (src.getBalance() < amount) throw new RuntimeException("Insufficient funds");
         src.setBalance(src.getBalance() - amount);
@@ -49,7 +52,7 @@ public class WalletService {
     }
 
     public List<Transaction> getHistory(String email) {
-        Wallet w = walletRepo.findByUserEmailForUpdate(email)
+        Wallet w = repository.findByUserEmailForUpdate(email)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
         return txRepo.findByWalletOrderByTimestampDesc(w);
     }

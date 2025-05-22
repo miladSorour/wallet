@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.milad.wallet.common.UtilDefaultProfile;
+import org.milad.wallet.config.WalletAppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -54,11 +57,12 @@ public class WalletApplication {
             log.warn("The host name could not be determined, using `localhost` as fallback");
         }
         log.info(
-                "\n----------------------------------------------------------\n\t" +
+                "\n---------------------------------------------------------------\n\t" +
                         "Application '{}' is running! Access URLs:\n\t" +
                         "Local: \t\t{}://localhost:{}{}\n\t" +
                         "External: \t{}://{}:{}{}\n\t" +
-                        "Profile(s): \t{}\n----------------------------------------------------------",
+                        "Profile(s): \t{}\n\t" +
+                        "swagger: \t{}://localhost:{}{}swagger-ui/index.html\n---------------------------------------------------------------",
                 env.getProperty("spring.application.name"),
                 protocol,
                 serverPort,
@@ -67,7 +71,10 @@ public class WalletApplication {
                 hostAddress,
                 serverPort,
                 contextPath,
-                env.getActiveProfiles()
+                env.getActiveProfiles(),
+                protocol,
+                serverPort,
+                contextPath
         );
     }
 

@@ -1,6 +1,17 @@
 package org.milad.wallet.domain.security;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class AuthRequest { private String username, password; }
+@Getter
+@Setter
+public class AuthRequest {
+
+    @NotNull
+    private String username;
+
+    @NotNull
+    private String password;
+
+}
