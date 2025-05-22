@@ -1,4 +1,4 @@
-package org.milad.wallet.domain.aop.log;
+package org.milad.wallet.aop.log;
 
 import java.util.Arrays;
 import org.aspectj.lang.JoinPoint;
