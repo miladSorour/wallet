@@ -33,6 +33,8 @@ public class User {
 
     private String fullName;
 
+    private boolean enabled;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Wallet wallet;
 }

@@ -27,14 +27,14 @@ It includes:
 
 ```plaintext
 User ──▶ Auth Service ──▶ JWT
-User ──▶ Wallet API ──▶ WalletService ──▶ DB (+record) ──▶ Kafka Audit Log
+User ──▶ Wallet API ──▶ WalletService ──▶ DB (+record)
 ```
 
 ### 2. Withdraw
 
 ```plaintext
 User ──▶ Auth Service ──▶ JWT
-User ──▶ Wallet API ──▶ WalletService ──▶ DB (balance check & update) ──▶ Kafka Audit Log
+User ──▶ Wallet API ──▶ WalletService ──▶ DB (balance check & update)
 ```
 
 ### 3. Transfer
@@ -43,8 +43,7 @@ User ──▶ Wallet API ──▶ WalletService ──▶ DB (balance check & 
 User ──▶ Auth Service ──▶ JWT
 User ──▶ Wallet API ──▶ WalletService
                   ├─▶ DB (sender balance check)
-                  ├─▶ DB (receiver balance update)
-                  └─▶ Kafka Audit Log
+                  └─▶ DB (receiver balance update)
 ```
 
 ---

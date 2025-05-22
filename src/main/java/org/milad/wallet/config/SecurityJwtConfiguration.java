@@ -2,7 +2,7 @@ package org.milad.wallet.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.extern.slf4j.Slf4j;
-import org.milad.wallet.domain.managment.SecurityMetersService;
+import org.milad.wallet.domain.security.SecurityMetersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

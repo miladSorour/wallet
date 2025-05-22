@@ -1,4 +1,4 @@
-package org.milad.wallet.domain.user;
+package org.milad.wallet.domain.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
