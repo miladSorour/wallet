@@ -69,13 +69,12 @@ http://localhost:8080/swagger-ui/index.html
 
 2. **Build the Docker image:**
    ```bash
-   ./mvnw clean package -DskipTests
-   docker build -t virtual-wallet:latest .
+   mvn compile -DskipTests=true com.google.cloud.tools:jib-maven-plugin:3.2.1:dockerBuild
    ```
 
 3. **Run the Docker container:**
    ```bash
-   docker run -p 8080:8080 virtual-wallet:latest
+   docker run -p 8080:8080 wallet:latest
    ```
 
 4. **Swagger will be available at:**

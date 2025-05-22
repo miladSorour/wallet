@@ -1,0 +1,14 @@
+version: '3'
+services:
+  portal:
+    image:  wallet:0.0.1
+    container_name: 'wallet'
+    ports:
+      - '8080:8080'
+    environment:
+      - "JAVA_OPTS=-Xmx1g"
+      - TZ=UTC-3:30
+      - # database
+      - SPRING_DATASOURCE_URL="jdbc:oracle:thin:@{ip:port}:XE"
+      - SPRING_DATASOURCE_USERNAME={username}
+      - SPRING_DATASOURCE_PASSWORD={password}
