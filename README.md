@@ -63,7 +63,7 @@ http://localhost:8080/swagger-ui/index.html
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/wallet.git
+   git clone https://github.com/miladSorour/wallet.git
    cd wallet
    ```
 
@@ -81,3 +81,15 @@ http://localhost:8080/swagger-ui/index.html
    ```http://localhost:8080/swagger-ui/index.html```
 
 ---
+
+## Improvement
+
+1. add Flyway db migration
+2. add pessimistic lock for strong consistency
+3. add GitHub action 
+4. add cache layer 
+5. add Role base access control (RBAC)
+6. add freezing and blocking balance  
+7. add hot account
+8. horizontal sharding for wallet table
+9. add audit to track the tables
