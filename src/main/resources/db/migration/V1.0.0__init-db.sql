@@ -50,3 +50,8 @@ alter table wallet
 create sequence tx_sequence_generator start with 1 increment by 1;
 create sequence user_sequence_generator start with 1 increment by 1;
 create sequence wallet_sequence_generator start with 1 increment by 1;
+
+alter table wallet_user add account_non_locked number(1,0) default 1 not null check (account_non_locked in (0,1));
+alter table wallet_user add failed_attempts number(10,0) default 0 not null;
+alter table wallet_user add lock_time timestamp(6) with time zone;
+

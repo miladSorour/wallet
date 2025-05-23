@@ -29,7 +29,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 public class Wallet extends AbstractAuditingEntity<Long> {
 
     @Id

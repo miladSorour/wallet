@@ -57,4 +57,7 @@ public class WalletService {
         transactionRepository.save(new Transaction(dst, TransactionType.TRANSFER, amount, "from:" + fromUsername));
     }
 
+    public Wallet findByUser(Long userId) {
+        return repository.findByUser(userId).orElseThrow(() -> new RuntimeException("Wallet not found"));
+    }
 }
