@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,8 +21,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Invalid Username/Password"));
+
+        if (!user.isAccountNonLocked()) {
+            if (Duration.between(user.getLockTime(), Instant.now()).toMinutes() >= 15) {
+               userService.resetFailedAttempts(user);
+            }
+        }
+
         return new CustomUserDetail(user.getId(), user.getUsername(), user.getPassword(), user.isEnabled(),
-                true, true, true,
+                true, true, user.isAccountNonLocked(),
                 AuthorityUtils.createAuthorityList("ROLE_USER"));
     }
+
+
 }

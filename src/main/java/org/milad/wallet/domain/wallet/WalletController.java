@@ -18,20 +18,20 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping("/topup")
-    public TransactionDto topUp(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto a) {
-        var tx = walletService.topUp(jwt.getSubject(), a.getAmount());
+    public TransactionDto topUp(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto request) {
+        var tx = walletService.topUp(jwt.getSubject(), request.getAmount());
         return map(tx);
     }
 
     @PostMapping("/withdraw")
-    public TransactionDto withdraw(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto a) {
-        var tx = walletService.withdraw(jwt.getSubject(), a.getAmount());
+    public TransactionDto withdraw(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto request) {
+        var tx = walletService.withdraw(jwt.getSubject(), request.getAmount());
         return map(tx);
     }
 
     @PostMapping("/transfer")
-    public String transfer(@AuthenticationPrincipal Jwt jwt, @RequestBody TransferDto t) {
-        walletService.transfer(jwt.getSubject(), t.getToEmail(), t.getAmount());
+    public String transfer(@AuthenticationPrincipal Jwt jwt, @RequestBody TransferDto request) {
+        walletService.transfer(jwt.getSubject(), request.getToUsername(), request.getAmount());
         return "OK";
     }
 

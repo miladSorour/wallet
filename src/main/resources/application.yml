@@ -2,6 +2,13 @@ server:
   port: 8080
   servlet:
     context-path: /
+logging:
+  level:
+    ROOT: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type: INFO
+    org.zalando.logbook: DEBUG
+    org.org.springframework: DEBUG
 spring:
   application:
     name: wallet

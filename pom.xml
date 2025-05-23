@@ -68,6 +68,12 @@
             <groupId>org.zalando</groupId>
             <artifactId>problem-spring-web</artifactId>
             <version>0.27.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>apiguardian-api</artifactId>
+                    <groupId>org.apiguardian</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -80,8 +86,8 @@
         </dependency>
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc8</artifactId>
-            <version>19.3.0.0</version>
+            <artifactId>ojdbc11</artifactId>
+            <version>23.4.0.24.05</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

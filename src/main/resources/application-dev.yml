@@ -7,6 +7,7 @@ spring:
     password: root
     hikari:
       poolName: wallet-dev
+      leak-detection-threshold: 30000
       auto-commit: false
       maximum-pool-size: 5
       minimum-idle: 2

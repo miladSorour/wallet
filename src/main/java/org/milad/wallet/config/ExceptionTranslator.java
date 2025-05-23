@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.zalando.problem.AbstractThrowableProblem;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
-        log.debug("Converting Exception to Problem Details:", ex);
+        log.error("Converting Exception to Problem Details:", ex);
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
         return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
     }
@@ -203,6 +204,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         if (err instanceof AccessDeniedException) return HttpStatus.FORBIDDEN;
         if (err instanceof ConcurrencyFailureException) return HttpStatus.CONFLICT;
         if (err instanceof BadCredentialsException) return HttpStatus.UNAUTHORIZED;
+        if (err instanceof AbstractThrowableProblem) return HttpStatus.valueOf(((AbstractThrowableProblem) err).getStatus().getStatusCode());
         return null;
     }
 

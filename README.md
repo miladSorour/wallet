@@ -63,8 +63,8 @@ http://localhost:8080/swagger-ui/index.html
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/virtual-wallet.git
-   cd virtual-wallet
+   git clone https://github.com/your-username/wallet.git
+   cd wallet
    ```
 
 2. **Build the Docker image:**
