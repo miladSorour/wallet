@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.milad.wallet.domain.user.User;
 import org.milad.wallet.domain.user.UserService;
 import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +17,12 @@ public class LoginSuccessListener implements ApplicationListener<AuthenticationS
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
-        String username = ((UserDetails) event.getAuthentication().getPrincipal()).getUsername();
-        User user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Invalid Username/Password"));
-        userService.resetFailedAttempts(user);
+
+        if (event.getAuthentication() instanceof UsernamePasswordAuthenticationToken authentication) {
+            CustomUserDetail userDetail = ((CustomUserDetail) authentication.getPrincipal());
+            User user = userService.findByUsername(userDetail.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Invalid Username/Password"));
+            userService.resetFailedAttempts(user);
+        }
+
     }
 }
