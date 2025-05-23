@@ -6,6 +6,7 @@ import org.milad.wallet.common.UtilDefaultProfile;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
@@ -18,6 +19,7 @@ import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_PRODUCTION;
 
 @SpringBootApplication
 @Slf4j
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class WalletApplication {
 
 

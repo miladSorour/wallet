@@ -10,12 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.milad.wallet.common.AbstractAuditingEntity;
 import org.milad.wallet.domain.transaction.Transaction;
 import org.milad.wallet.domain.user.User;
 
@@ -28,10 +30,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Wallet {
+public class Wallet extends AbstractAuditingEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wallet_sequence_generator")
+    @SequenceGenerator(name = "wallet_sequence_generator", sequenceName = "wallet_sequence_generator", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)
@@ -45,5 +48,5 @@ public class Wallet {
     private List<Transaction> transactions = new ArrayList<>();
 
     @Version
-    private int version;
+    private Long version;
 }

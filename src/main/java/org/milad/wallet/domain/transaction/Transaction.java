@@ -10,10 +10,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.milad.wallet.common.AbstractAuditingEntity;
 import org.milad.wallet.domain.wallet.Wallet;
 
 import java.time.LocalDateTime;
@@ -23,9 +25,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Transaction {
+public class Transaction extends AbstractAuditingEntity<Long> {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tx_sequence_generator")
+    @SequenceGenerator(name = "tx_sequence_generator", sequenceName = "tx_sequence_generator", allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

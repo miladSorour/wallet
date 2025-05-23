@@ -3,6 +3,7 @@ package org.milad.wallet.domain.security;
 import lombok.RequiredArgsConstructor;
 import org.milad.wallet.domain.user.User;
 import org.milad.wallet.domain.user.UserService;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,14 +18,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Invalid Username/Password"));
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities("ROLE_USER")
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(!user.isEnabled())
-                .build();
+        return new CustomUserDetail(user.getId(), user.getUsername(), user.getPassword(), user.isEnabled(),
+                true, true, true,
+                AuthorityUtils.createAuthorityList("ROLE_USER"));
     }
 }

@@ -2,6 +2,7 @@ package org.milad.wallet.common;
 
 import lombok.RequiredArgsConstructor;
 import org.milad.wallet.config.WalletAppProperties;
+import org.milad.wallet.domain.security.CustomUserDetail;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -33,6 +34,7 @@ public class UtilJwt {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
                 .subject(authentication.getName())
+                .claim("i", ((CustomUserDetail) authentication.getPrincipal()).getId())
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
