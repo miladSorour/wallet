@@ -1,6 +1,8 @@
 package org.milad.wallet.aop.log;
 
 import java.util.Arrays;
+
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.stereotype.Component;
 
 import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_DEVELOPMENT;
 
@@ -20,6 +23,8 @@ import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_DEVELOPMENT
  * By default, it only runs with the "dev" profile.
  */
 @Aspect
+@Component
+@Slf4j
 public class LoggingAspect {
 
     private final Environment env;
@@ -28,17 +33,15 @@ public class LoggingAspect {
         this.env = env;
     }
 
-    /**
-     * Pointcut that matches all repositories, services and Web REST endpoints.
-     */
-    @Pointcut(
-        "within(@org.springframework.stereotype.Repository *)" +
-        " || within(@org.springframework.stereotype.Service *)" +
-        " || within(@org.springframework.web.bind.annotation.RestController *)"
-    )
+
+    //Pointcut that matches all repositories, services and Web REST endpoints.
+    @Pointcut("within(@org.springframework.stereotype.Repository *)\" +\n" +
+            "        \" || within(@org.springframework.stereotype.Service *)\" +\n" +
+            "        \" || within(@org.springframework.web.bind.annotation.RestController *)")
     public void springBeanPointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
+
 
     /**
      * Retrieves the {@link Logger} associated to the given {@link JoinPoint}.
@@ -84,9 +87,8 @@ public class LoggingAspect {
      */
     @Around("springBeanPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        Logger log = logger(joinPoint);
-        if (log.isDebugEnabled()) {
-            log.debug("Enter: {}() with argument[s] = {}", joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
+        if (log.isInfoEnabled()) {
+            log.info("Enter: {}() with argument[s] = {}", joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
         }
         try {
             Object result = joinPoint.proceed();
