@@ -1,5 +1,6 @@
 package org.milad.wallet.exception;
 
+import lombok.Getter;
 import org.springframework.http.ProblemDetail;
 
 import java.net.URI;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Getter
 public class ProblemDetailWithCause extends ProblemDetail {
     private ProblemDetailWithCause cause;
 
@@ -17,10 +19,6 @@ public class ProblemDetailWithCause extends ProblemDetail {
     ProblemDetailWithCause(int rawStatus, ProblemDetailWithCause cause) {
         super(rawStatus);
         this.cause = cause;
-    }
-
-    public ProblemDetailWithCause getCause() {
-        return this.cause;
     }
 
     public void setCause(ProblemDetailWithCause cause) {
@@ -92,9 +90,9 @@ public class ProblemDetailWithCause extends ProblemDetail {
             cause.setTitle(this.title);
             cause.setDetail(this.detail);
             cause.setInstance(this.instance);
-            Map var10000 = this.properties;
+            Map map = this.properties;
             Objects.requireNonNull(cause);
-            var10000.forEach((key, value) -> cause.setProperty((String) key, value) );
+            map.forEach((key, value) -> cause.setProperty((String) key, value) );
             cause.setCause(this.cause);
             return cause;
         }

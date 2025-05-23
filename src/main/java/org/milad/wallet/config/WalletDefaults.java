@@ -1,11 +1,6 @@
 package org.milad.wallet.config;
 
 
-import java.util.List;
-
-/**
- * <p>KipitDefaults interface.</p>
- */
 @SuppressWarnings("java:S2386")
 public interface WalletDefaults {
 

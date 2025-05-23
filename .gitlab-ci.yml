@@ -1,0 +1,180 @@
+variables:
+  DEPLOY_VOLUME_COMMAND: ""
+  BRANCH_NAME: ${CI_COMMIT_BRANCH}-
+  TAG_COMMIT_VESRION: ${BRANCH_NAME}${CI_COMMIT_SHORT_SHA}
+  TAG_VESRION: latest
+  DESTINATION_REPOSITORY: $NEXUS_URL/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  DEPLOY: "false"
+  GIT_STRATEGY: clone
+  BACK_END_MAIN_PORT: 8080
+  BACK_END_DEVELOP_PORT: 8081
+  CONTAINER_PORT: 8080
+  PROFILE: test
+
+.login_into_nexus: &login_into_nexus
+  - echo "Login Into Nexus...."
+  - docker login $NEXUS_URL -u $NEXUS_USER -p $NEXUS_PASS
+
+.find-container-name: &find-container-name
+  - DOCKER_CONTAINER_NAMES=$(docker ps -a --format '{{.Names}}\t{{.Image}}' | grep -e "^${BRANCH_NAME}.*$" | grep -e ${DESTINATION_REPOSITORY} | awk -F'\t' '{print $1}' || true)
+
+.find-image-name: &find-image-name
+  - DOCKER_IMAGE_CORRESPONDING_FOR_CONTAINER=$(docker images | grep -e "${BRANCH_NAME}" | grep -e ${DESTINATION_REPOSITORY} | tr -s ' ' | cut -d ' ' -f 3 || true)
+
+.check-container-exists: &check-container-exists
+  - if [ -n "$DOCKER_CONTAINER_NAMES" ]; then echo "$DOCKER_CONTAINER_NAMES" | xargs -I {} docker rm -f {}; fi
+
+.check-image-exists: &check-image-exists
+  - if [ -n "$DOCKER_IMAGE_CORRESPONDING_FOR_CONTAINER" ]; then echo "$DOCKER_IMAGE_CORRESPONDING_FOR_CONTAINER" | xargs -I {} docker rmi -f {}; fi
+
+.deploy-rules:
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /action: deploy/'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE != "push" && $CI_PIPELINE_SOURCE != "merge_request_event"' # manual pipeline on main using Run Pipeline button
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "main"' # manual pipeline on main using Run Pipeline
+      when: always
+
+.test-rules: &test-rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "main"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "develop"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME != "main" && $CI_COMMIT_REF_NAME != "develop"'
+
+image: {server.nexus.ip}/openjdk:17-oracle
+services:
+  - docker:dind
+
+stages:
+  - test
+  - build
+  - docker-image
+  - clean-image
+  - deploy-stage
+
+unit-test:
+  stage: test
+  needs: []
+  script:
+    - chmod +x mvnw
+    - ./mvnw $MAVEN_CLI_OPTS test -Dmaven.repo.remote=$MAVEN_USER_HOME
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+  allow_failure: true
+  <<: *test-rules
+
+build:
+  stage: build
+  script:
+    - chmod +x mvnw
+    - ./mvnw $MAVEN_CLI_OPTS clean compile install -Dmaven.test.skip=true -Dmaven.repo.remote=$MAVEN_USER_HOME
+
+docker-image:
+  stage: docker-image
+  dependencies:
+    - build
+  script:
+    - echo "building docker image ......"
+    - chmod +x mvnw
+    - ./mvnw $MAVEN_CLI_OPTS compile jib:build -DsendCredentialsOverHttp=true -Dmaven.test.skip=true -Dmaven.repo.remote=$MAVEN_USER_HOME  -Djib.to.image=${DESTINATION_REPOSITORY}:${TAG_COMMIT_VESRION} -Djib.to.auth.username=$NEXUS_USER -Djib.to.auth.password=$NEXUS_PASS
+  rules:
+    - !reference [ .deploy-rules, rules ]
+
+cleaning:
+  stage: clean-image
+  needs:
+    - docker-image
+  image: {server.nexus.ip}/docker:latest
+  script:
+    - echo "clean image"
+    - *find-image-name
+    - *check-image-exists
+    - echo "Cleanup completed"
+  rules:
+    - !reference [ .deploy-rules, rules ]
+
+
+cleanup:
+  stage: deploy-stage
+  resource_group: deploy_stage
+  image: {server.nexus.ip}/docker:latest
+  before_script:
+    - *find-container-name
+    - *find-image-name
+  script:
+    - *check-container-exists
+    - *check-image-exists
+    - echo "Cleanup completed"
+  tags:
+    - stage
+  rules:
+    - !reference [ .deploy-rules, rules ]
+
+deploy-stage:
+  image: {server.nexus.ip}/docker:latest
+  stage: deploy-stage
+  resource_group: deploy_stage
+  when: on_success
+  before_script:
+    - *login_into_nexus
+  script:
+    - echo hostname -I | awk '{print $1}'
+    - docker pull ${DESTINATION_REPOSITORY}:${TAG_COMMIT_VESRION}
+    - |
+      # find expose port ... 
+      if [ "$CI_COMMIT_REF_NAME" = "main" ]; then
+            export RANDOM_PORT=$BACK_END_MAIN_PORT;
+      elif [ "$CI_COMMIT_REF_NAME" = "develop" ]; then
+            export RANDOM_PORT=$BACK_END_DEVELOP_PORT;
+      elif [ "$CI_COMMIT_REF_NAME" == feat-* || "$CI_COMMIT_REF_NAME" == bugfix || "$CI_COMMIT_REF_NAME" == hotfix ]; then
+            export RANDOM_PORT=$(shuf -i 1000-8999 -n 1);
+      else
+            IFS=","
+            for static_branch_port in $STATIC_BRANCH_PORTS; do
+            BRANCH_NAME=$(echo "$static_branch_port" | cut -d ':' -f 1)
+            BRANCH_PORT=$(echo "$static_branch_port" | cut -d ':' -f 2)
+              if [ "$CI_COMMIT_REF_NAME" = "$BRANCH_NAME" ]; then
+                echo "port for branch $BRANCH_NAME is $BRANCH_PORT"
+                export RANDOM_PORT=$BRANCH_PORT;
+              fi
+            done 
+      fi
+    - |
+      # recreate container ...
+    - docker run -d --name ${TAG_COMMIT_VESRION} ${DEPLOY_VOLUME_COMMAND} -e SPRING_PROFILES_ACTIVE=$PROFILE -p $RANDOM_PORT:$CONTAINER_PORT ${DESTINATION_REPOSITORY}:${TAG_COMMIT_VESRION}
+    - echo $RANDOM_PORT
+    - echo "RANDOM_PORT=$RANDOM_PORT" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    url: http://{stage.ip}:$RANDOM_PORT
+    on_stop: stop-stage
+  tags:
+    - stage
+  rules:
+    - !reference [ .deploy-rules, rules ]
+
+
+stop-stage:
+  stage: deploy-stage
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    action: stop
+  script:
+    - *find-container-name
+    - *check-container-exists
+  tags:
+    - stage
+  when: manual
