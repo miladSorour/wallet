@@ -25,3 +25,5 @@ spring:
             scripts:
               action: update
               create-target: src/main/resources/ddl_jpa_creation.sql
+management.endpoints.web.exposure.include: "*"
+management.endpoint.health.show-details: always

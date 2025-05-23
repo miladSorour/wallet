@@ -16,6 +16,7 @@ It includes:
 - 📦 RESTful API with Swagger documentation
 - 🐘 Oracle database integration
 - 🐳 Docker support for deployment
+- 📈 Built-in monitoring support with Prometheus for metrics and alerting
 - 📂 Exception handling using Zalando’s Problem-Spring-Web
 - 🧵 Thread-safe, concurrent transfer logic with Optimistic Locking (@Version)
 

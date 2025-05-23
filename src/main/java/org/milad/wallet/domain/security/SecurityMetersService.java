@@ -17,12 +17,14 @@ public class SecurityMetersService {
     private final Counter tokenExpiredCounter;
     private final Counter tokenUnsupportedCounter;
     private final Counter tokenMalformedCounter;
+    private final Counter incorrectLogin;
 
     public SecurityMetersService(MeterRegistry registry) {
         this.tokenInvalidSignatureCounter = invalidTokensCounterForCauseBuilder("invalid-signature").register(registry);
         this.tokenExpiredCounter = invalidTokensCounterForCauseBuilder("expired"). register(registry);
         this.tokenUnsupportedCounter = invalidTokensCounterForCauseBuilder("unsupported").register(registry);
         this.tokenMalformedCounter = invalidTokensCounterForCauseBuilder("malformed").register(registry);
+        this.incorrectLogin = invalidTokensCounterForCauseBuilder("incorrect-login").register(registry);
     }
 
     private Counter.Builder invalidTokensCounterForCauseBuilder(String cause) {
@@ -42,6 +44,10 @@ public class SecurityMetersService {
 
     public void trackTokenUnsupported() {
         this.tokenUnsupportedCounter.increment();
+    }
+
+    public void trackIncorrectLogin() {
+        this.incorrectLogin.increment();
     }
 
     public void trackTokenMalformed() {

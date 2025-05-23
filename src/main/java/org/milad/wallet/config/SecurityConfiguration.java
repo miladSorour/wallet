@@ -61,6 +61,7 @@ public class SecurityConfiguration {
                         authz
                                 .requestMatchers("/auth/login/**").permitAll()
                                 .requestMatchers("/api/user/register").permitAll()
+                                .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/api/**").authenticated()
                 )
