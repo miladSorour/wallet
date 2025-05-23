@@ -93,3 +93,4 @@ http://localhost:8080/swagger-ui/index.html
 7. add hot account
 8. horizontal sharding for wallet table
 9. add audit to track the tables
+10. add mapstruct
