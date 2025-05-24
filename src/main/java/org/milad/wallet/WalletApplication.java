@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_DEVELOPMENT;
 import static org.milad.wallet.config.WalletConstants.SPRING_PROFILE_PRODUCTION;
 
+@EnableRetry
 @SpringBootApplication
 @Slf4j
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")

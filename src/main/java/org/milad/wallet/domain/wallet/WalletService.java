@@ -7,6 +7,9 @@ import org.milad.wallet.domain.transaction.TransactionRepository;
 import org.milad.wallet.domain.transaction.TransactionType;
 import org.milad.wallet.exception.InsufficientBalanceException;
 import org.milad.wallet.exception.RecordNotFoundException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -44,6 +47,11 @@ public class WalletService {
     }
 
     @Transactional
+    @Retryable(
+            value = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     public void transfer(String fromUsername, String toUsername, double amount) {
         Wallet src = repository.findByUserUsername(fromUsername).orElseThrow(() -> new RecordNotFoundException("Source wallet"));
         Wallet dst = repository.findByUserUsername(toUsername).orElseThrow(() -> new RecordNotFoundException("Destination wallet"));
@@ -58,6 +66,6 @@ public class WalletService {
     }
 
     public Wallet findByUser(Long userId) {
-        return repository.findByUser(userId).orElseThrow(() -> new RuntimeException("Wallet not found"));
+        return repository.findByUser(userId).orElseThrow(() -> new RecordNotFoundException("Wallet"));
     }
 }

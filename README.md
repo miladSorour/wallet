@@ -85,7 +85,7 @@ http://localhost:8080/swagger-ui/index.html
 ## Improvement
 
 1. add Flyway db migration
-2. add pessimistic lock for strong consistency
+2. add pessimistic lock
 3. add GitHub action 
 4. add cache layer 
 5. add Role base access control (RBAC)
