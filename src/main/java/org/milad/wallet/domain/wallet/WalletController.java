@@ -3,6 +3,7 @@ package org.milad.wallet.domain.wallet;
 import lombok.RequiredArgsConstructor;
 import org.milad.wallet.domain.transaction.Transaction;
 import org.milad.wallet.domain.transaction.TransactionDto;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,10 @@ public class WalletController {
         return new WalletResponse(walletService.findByUser(jwt.getClaim("i")).getBalance());
     }
 
-    @PostMapping("/topup")
-    public TransactionDto topUp(@AuthenticationPrincipal Jwt jwt, @RequestBody AmountDto request) {
-        var tx = walletService.topUp(jwt.getSubject(), request.getAmount());
+    @PostMapping("/deposit")
+    @PreAuthorize("hasAuthority('deposit')")
+    public TransactionDto deposit(@RequestBody DepositRequest request) {
+        var tx = walletService.deposit(request.getUsername(), request.getAmount());
         return map(tx);
     }
 

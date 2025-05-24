@@ -1,6 +1,7 @@
 package org.milad.wallet.config;
 
 
+import org.milad.wallet.domain.security.CustomJwtAuthenticationConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,7 +72,12 @@ public class SecurityConfiguration {
                                 .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                                 .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())
+                        )
+                );
+               // .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
         return http.build();
 
     }

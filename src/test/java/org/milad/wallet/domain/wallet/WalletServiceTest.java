@@ -49,13 +49,13 @@ class WalletServiceTest {
     }
 
     @Test
-    void testTopUpSuccessfully() {
+    void testDepositSuccessfully() {
         double topUpAmount = 50.0;
 
         when(repository.findByUserUsername(username)).thenReturn(Optional.of(sharedWallet));
         when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Transaction tx = service.topUp(username, topUpAmount);
+        Transaction tx = service.deposit(username, topUpAmount);
 
         assertNotNull(tx);
         assertEquals(TransactionType.TOPUP, tx.getType());
@@ -68,10 +68,10 @@ class WalletServiceTest {
     }
 
     @Test
-    void testTopUpWhenWalletNotFound() {
+    void testDepositWhenWalletNotFound() {
         when(repository.findByUserUsername("unknown_user")).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.topUp("unknown_user", 100.0));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.deposit("unknown_user", 100.0));
 
         assertEquals("Wallet not found", exception.getMessage());
         verify(repository).findByUserUsername("unknown_user");

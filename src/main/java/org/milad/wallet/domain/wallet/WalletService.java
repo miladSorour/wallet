@@ -31,7 +31,7 @@ public class WalletService {
     }
 
     @Transactional
-    public Transaction topUp(String username, double amount) {
+    public Transaction deposit(String username, double amount) {
         Wallet walletDB = repository.findByUserUsername(username).orElseThrow(() -> new RuntimeException("Wallet not found"));
         walletDB.setBalance(walletDB.getBalance() + amount);
         return transactionRepository.save(new Transaction(walletDB, TransactionType.TOPUP, amount, "Top-up"));

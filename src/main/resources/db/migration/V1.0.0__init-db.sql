@@ -55,3 +55,15 @@ alter table wallet_user add account_non_locked number(1,0) default 1 not null ch
 alter table wallet_user add failed_attempts number(10,0) default 0 not null;
 alter table wallet_user add lock_time timestamp(6) with time zone;
 
+
+create table authority (id number(19,0) not null, name varchar2(255 char) not null, primary key (id));
+alter table authority add constraint UKjdeu5vgpb8k5ptsqhrvamuad2 unique (name);
+create sequence authority_sequence_generator start with 1 increment by 1;
+
+create table user_authority (user_id number(19,0) not null, authority_id number(19,0) not null, primary key (user_id, authority_id));
+alter table user_authority add constraint FKgvxjs381k6f48d5d2yi11uh89 foreign key (authority_id) references authority;
+alter table user_authority add constraint FKc7687bpykk86a2lgh28qonnk9 foreign key (user_id) references wallet_user;
+
+
+insert into AUTHORITY (ID, NAME) values (1, 'deposit');
+insert into AUTHORITY (ID, NAME) values (1, 'create:user');

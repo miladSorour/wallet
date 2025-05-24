@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,14 @@ public class UserController {
         user.setPassword(request.getPassword());
         user.setFullName(request.getFullName());
         User userDB = userService.register(user);
+        return new RegisterUserResponse(userDB.getUsername(), userDB.getFullName());
+    }
+
+    @PostMapping("/create-user")
+   // @PreAuthorize("hasAuthority('create:user')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RegisterUserResponse createUser(@RequestBody @Valid UserDTO request) {
+        User userDB = userService.createUser( UserMapper.mapToEntity(request));
         return new RegisterUserResponse(userDB.getUsername(), userDB.getFullName());
     }
 }

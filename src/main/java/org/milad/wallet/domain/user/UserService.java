@@ -68,4 +68,12 @@ public class UserService {
     public Optional<User> findByUsername(String username) {
         return repository.findByUsername(username);
     }
+
+    @Transactional
+    public User createUser(User user) {
+        if (user.getPassword() != null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
+        return save(user);
+    }
 }
